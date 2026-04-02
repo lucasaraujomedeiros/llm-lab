@@ -1,1 +1,38 @@
-.venv
+# ambiente virtual
+venv/
+.env/
+
+# cache python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# notebooks
+.ipynb_checkpoints/
+
+# arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+
+# modelos grandes
+*.pt
+*.pth
+*.ckpt
+
+# datasets grandes
+data/
+datasets/
+
+# build
+build/
+dist/
+*.egg-info
+
+#venv
+venv/
+.env/
+.venv/
