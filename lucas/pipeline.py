@@ -236,7 +236,7 @@ def avaliar(model, device):
     val_loader = create_dataloader(text_data[split_idx:], batch_size=2, max_length=GPT_CONFIG_124M["context_length"], stride=128, shuffle=False)
 
     train_loss, val_loss = evaluate_model(model=model, train_loader=train_loader,
-                                          val_loader=val_loader, device=device, eval_iter=10)
+                                          val_loader=val_loader, device=device, eval_iter=10    )
     return (train_loss, val_loss)
 
 def calc_loss_loader(data_loader, model, device, num_batches=None):
