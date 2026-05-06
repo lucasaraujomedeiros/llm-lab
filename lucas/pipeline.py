@@ -11,7 +11,7 @@ import math
 # ==========================================
 GPT_CONFIG_124M = {
     "vocab_size": 50257,    # Vocabulary size (GPT-2)
-    "context_length": 1024,  # Reduzido para caber melhor na memória local (no notebook original era 1024)
+    "context_length": 1024, # batch_size
     "emb_dim": 768,         # Embedding dimension
     "n_heads": 12,          # Number of attention heads
     "n_layers": 12,         # Number of layers
@@ -236,7 +236,7 @@ def avaliar(model, device):
     val_loader = create_dataloader(text_data[split_idx:], batch_size=2, max_length=GPT_CONFIG_124M["context_length"], stride=128, shuffle=False)
 
     train_loss, val_loss = evaluate_model(model=model, train_loader=train_loader,
-                                          val_loader=val_loader, device=device, eval_iter=10    )
+                                          val_loader=val_loader, device=device, eval_iter=1    )
     return (train_loss, val_loss)
 
 def calc_loss_loader(data_loader, model, device, num_batches=None):
@@ -303,7 +303,50 @@ def load_and_evaluate_pipeline():
         print(f"\nPrompt: '{prompt}'")
         print(f"Gerado: {texto_gerado}")
 
+def n_parametros(vocab_size=50257, context_length=1024, emb_dim=768, n_layers=12):
+    emb_parameters = vocab_size * emb_dim
+    pos_emb = context_length * emb_dim
+
+    token_emb = emb_parameters + pos_emb
+    
+    out_proj = emb_dim * emb_dim #linear transformation at the end of multihead attention
+    multihead_attention = emb_dim * emb_dim * 3 + out_proj 
+
+    bias = 5*emb_dim
+    feed_forward = emb_dim * 4 * emb_dim * 2 + bias
+    
+    layer_norm = 4 * emb_dim
+
+    transformer_block = multihead_attention + feed_forward + layer_norm
+    
+    
+    out_head = emb_dim * vocab_size
+
+
+    total = token_emb + transformer_block * n_layers + emb_dim * 2
+    
+    porcentagem_emb = round(token_emb *2 / total, 2)
+    porcentagem_transformer = round(transformer_block * n_layers/ total, 2)
+    
+    print("total =" , total, "\nemb_porcentagem =" , porcentagem_emb,"\ntransformer_porcentagem" ,porcentagem_transformer)
+def printa_parametros(*args):
+    for arg in args:
+        print(arg)
 if __name__ == "__main__":
-    os.system("pwd")
-    load_and_evaluate_pipeline()
+     
+    GPT_CONFIG_124M = {
+        "vocab_size": 50257,    # Vocabulary size (GPT-2)
+        "context_length": 512, # batch_size
+        "emb_dim": 768,         # Embedding dimension
+#        "n_heads": 12,          # Number of attention heads
+        "n_layers": 9,         # Number of layers
+ #       "drop_rate": 0.1,       # Dropout rate
+#        "qkv_bias": False        # Query-Key-Value bias
+    }
+    print(n_parametros(**GPT_CONFIG_124M))
+
+    
+    print("Quer avaliar seu modelo? y/n")
+    if input() == "y":
+        load_and_evaluate_pipeline()
 
